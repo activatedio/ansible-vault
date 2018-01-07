@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  become: yes
+  roles:
+    - role: ansible-activated-vault
+  vars:
+    vault_tls_disable: 1

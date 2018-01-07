@@ -1,0 +1,65 @@
+---
+# tasks file for ansible-activated-vault
+
+- name: Create vault user
+  user:
+    name: "{{ vault_user }}"
+    state: present
+- name: Remove current swap from fstab
+  lineinfile:
+    dest: /etc/fstab
+    regexp: '^/[\S]+\s+none\s+swap '
+    state: absent
+- name: Disable current swap
+  command: swapoff --all
+  ignore_errors: yes
+  tags:
+    -skip_ansible_lint
+- name: Install unzip
+  apt:
+    name: unzip
+    state: present
+    update_cache: true
+- name: Download vault
+  unarchive:
+    src: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip"
+    dest: /usr/local/sbin
+    creates: "/usr/local/sbin/vault"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_user }}"
+    mode: 0500
+    remote_src: True
+  notify: Enable and start vault
+- name: Enable mlock cap
+  shell: "setcap cap_ipc_lock=+ep $(readlink -f $(which vault))"
+  args:
+    executable: /bin/bash
+  tags:
+    -skip_ansible_lint
+- name: Create vault configuration directory
+  file:
+    path: /etc/vault
+    state: directory
+    owner: "{{ vault_user }}"
+    group: "{{ vault_user }}"
+    mode: 0700
+- name: Create vault configuration
+  template:
+    src: config.hcl.j2
+    dest: /etc/vault/config.hcl
+    owner: "{{ vault_user }}"
+    group: "{{ vault_user }}"
+    mode: 0600
+  notify: Enable and start vault
+- name: Create systemd service file
+  template:
+    src: vault.service.j2
+    dest: /lib/systemd/system/vault.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Enable and start vault
+- name: Run systemctl daemon-reload
+  command: systemctl daemon-reload
+  tags:
+    -skip_ansible_lint

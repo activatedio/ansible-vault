@@ -1,0 +1,12 @@
+
+storage "{{ vault_storage }}" {
+{% if vault_storage == 'consul' %}
+  address = "127.0.0.1"
+  path = "{{ vault_path }}"
+{% endif %}
+}
+
+listener "tcp" {
+  address = "{{ vault_tcp_listener_address }}"
+  tls_disable = {{ vault_tls_disable }}
+}

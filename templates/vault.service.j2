@@ -1,0 +1,11 @@
+[Unit]
+Description=HashiCorp Vault
+After=network.target
+
+[Service]
+User={{ vault_user }}
+ExecStart=/usr/local/sbin/vault server -config /etc/vault/config.hcl
+PIDFile=/var/run/vault.pid
+
+[Install]
+WantedBy=multi-user.target

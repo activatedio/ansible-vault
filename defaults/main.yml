@@ -1,0 +1,9 @@
+---
+# defaults file for ansible-activated-vault
+
+vault_user: vault
+vault_version: 0.9.1
+vault_storage: inmem
+vault_tls_disable: 0
+vault_consul_path: vault
+vault_tcp_listener_address: 127.0.0.1:8200
