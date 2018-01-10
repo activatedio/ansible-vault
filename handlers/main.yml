@@ -1,7 +1,6 @@
 ---
 # handlers file for ansible-activated-vault
-- name: Enable and start vault
+- name: Restart vault
   service:
     name: vault
-    enabled: yes
-    state: started
+    state: restarted

@@ -1,0 +1,15 @@
+{
+  "data_dir": "/tmp",
+  "log_level": "INFO",
+  "server": true,
+  "addresses": {
+    "https": "127.0.0.1"
+  },
+  "ports": {
+    "http": -1,
+    "https": 8500
+  },
+  "key_file": "/etc/consul/consul-server.key",
+  "cert_file": "/etc/consul/consul-server.crt",
+  "ca_file": "/etc/ca/ca.pem"
+}
