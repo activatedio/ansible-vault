@@ -71,9 +71,13 @@
     - name: Start consul dev agent
       shell: nohup consul agent -config-dir=/etc/consul -retry-join=127.0.0.1 -bootstrap-expect=1 &
       when: consul_running.rc != 0
+      tags:
+        - skip_ansible_lint
   handlers:
     - name: Update certificate index
       shell: /usr/sbin/update-ca-certificates
+      tags:
+        - skip_ansible_lint
   roles:
     - role: ansible-activated-vault
   vars:
@@ -83,4 +87,3 @@
     vault_tls_key_file: /etc/vault-keys/vault-server.key
     vault_consul_tls_cert_file: /etc/vault-keys/vault-consul-client.crt
     vault_consul_tls_key_file: /etc/vault-keys/vault-consul-client.key
-
