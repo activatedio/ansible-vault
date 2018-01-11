@@ -49,10 +49,16 @@
       with_items:
         - consul-server.crt
         - consul-server.key
+    - name: Create vault keys directory
+      file:
+        path: /etc/vault-keys
+        state: directory
+        owner: "{{ vault_user }}"
+        group: "{{ vault_user }}"
     - name: Copy vault keys
       copy:
         src: "./certs/{{ item }}"
-        dest: /etc/vault
+        dest: /etc/vault-keys
       with_items:
         - vault-consul-client.crt
         - vault-consul-client.key
@@ -73,8 +79,8 @@
   vars:
     vault_storage: consul
     vault_tcp_listener_address: 0.0.0.0:8200
-    vault_tls_cert_file: /etc/vault/vault-server.crt
-    vault_tls_key_file: /etc/vault/vault-server.key
-    vault_consul_tls_cert_file: /etc/vault/vault-consul-client.crt
-    vault_consul_tls_key_file: /etc/vault/vault-consul-client.key
+    vault_tls_cert_file: /etc/vault-keys/vault-server.crt
+    vault_tls_key_file: /etc/vault-keys/vault-server.key
+    vault_consul_tls_cert_file: /etc/vault-keys/vault-consul-client.crt
+    vault_consul_tls_key_file: /etc/vault-keys/vault-consul-client.key
 
