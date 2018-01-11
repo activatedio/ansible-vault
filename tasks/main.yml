@@ -63,29 +63,6 @@
   command: systemctl daemon-reload
   tags:
     -skip_ansible_lint
-- name: Copy vault server key
-  copy:
-    src: "{{ vault_tls_key_local_file }}"
-    dest: /etc/vault/vault-server.key
-    owner: "{{ vault_user }}"
-    group: "{{ vault_user }}"
-    mode: 0400
-- name: Copy single vault server cert
-  copy:
-    src: "{{ vault_tls_cert_local_file }}"
-    dest: /etc/vault/vault-server-comp.crt
-    owner: "{{ vault_user }}"
-    group: "{{ vault_user }}"
-    mode: 0400
-  when: vault_tls_cert_local_file is defined and vault_tls_ca_local_file is not defined
-- name: Create composite vault server cert
-  template:
-    src: vault-server-comp.crt.j2
-    dest: /etc/vault/vault-server-comp.crt
-    owner: "{{ vault_user }}"
-    group: "{{ vault_user }}"
-    mode: 0400
-  when: vault_tls_cert_local_file is defined and vault_tls_ca_local_file is defined
 - name: Enable and start vault
   service:
     name: vault

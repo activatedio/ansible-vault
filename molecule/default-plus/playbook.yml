@@ -3,12 +3,16 @@
   hosts: all
   become: yes
   pre_tasks:
+    - name: Create vault user
+      user:
+        name: "{{ vault_user }}"
+        state: present
     - name: Install unzip
       apt:
         name: unzip
         state: present
         update_cache: true
-    - name: Download vault
+    - name: Download consul
       unarchive:
         src: "https://releases.hashicorp.com/consul/1.0.2/consul_1.0.2_linux_amd64.zip"
         dest: /usr/local/sbin
@@ -22,24 +26,22 @@
       ignore_errors: yes
       changed_when: false
       register: consul_running
-    - name: Create ca bundle
+    - name: Create ca bundle directory
       file:
-        path: /etc/ca
+        path: /usr/local/share/ca-certificates
         state: directory
+        owner: root
+        group: root
+        mode: 0755
+    - name: Copy SSL CA
+      copy:
+        src: ./certs/ca.crt
+        dest: /usr/local/share/ca-certificates/localhost.crt
+      notify: Update certificate index
     - name: Create consul config directory
       file:
         path: /etc/consul
         state: directory
-    - name: Create vault keys directory
-      file:
-        path: /etc/vault-keys
-        state: directory
-        owner: "{{ vault_user }}"
-        group: "{{ vault_user }}"
-    - name: Copy SSL CA
-      copy:
-        src: ./certs/ca.pem
-        dest: "/etc/ca/ca.pem"
     - name: Copy consul keys
       copy:
         src: "./certs/{{ item }}"
@@ -50,7 +52,7 @@
     - name: Copy vault keys
       copy:
         src: "./certs/{{ item }}"
-        dest: /etc/vault-keys
+        dest: /etc/vault
       with_items:
         - vault-consul-client.crt
         - vault-consul-client.key
@@ -63,15 +65,16 @@
     - name: Start consul dev agent
       shell: nohup consul agent -config-dir=/etc/consul -retry-join=127.0.0.1 -bootstrap-expect=1 &
       when: consul_running.rc != 0
+  handlers:
+    - name: Update certificate index
+      shell: /usr/sbin/update-ca-certificates
   roles:
     - role: ansible-activated-vault
   vars:
     vault_storage: consul
     vault_tcp_listener_address: 0.0.0.0:8200
-    vault_tls_ca_local_file: ./certs/ca.pem
-    vault_tls_cert_local_file: ./certs/vault-server.crt
-    vault_tls_key_local_file: ./certs/vault-server.key
-    vault_consul_tls_ca_file: /etc/ca/ca.pem
-    vault_consul_tls_cert_file: /etc/vault-keys/vault-consul-client.crt
-    vault_consul_tls_key_file: /etc/vault-keys/vault-consul-client.key
+    vault_tls_cert_file: /etc/vault/vault-server.crt
+    vault_tls_key_file: /etc/vault/vault-server.key
+    vault_consul_tls_cert_file: /etc/vault/vault-consul-client.crt
+    vault_consul_tls_key_file: /etc/vault/vault-consul-client.key
 

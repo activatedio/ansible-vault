@@ -13,6 +13,7 @@ create_key_pair() {
 openssl genrsa -out ca.key 2048
 openssl req -x509 -new -nodes -key ca.key -sha256 -days 1825 -out ca.pem \
   -subj "/C=US/ST=Washington/L=Some/O=Test/OU=IT Department/CN=*"
+openssl x509 -in ca.pem -inform PEM -out ca.crt
 
 create_key_pair vault-server localhost
 create_key_pair consul-server localhost

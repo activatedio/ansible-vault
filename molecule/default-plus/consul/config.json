@@ -10,6 +10,5 @@
     "https": 8500
   },
   "key_file": "/etc/consul/consul-server.key",
-  "cert_file": "/etc/consul/consul-server.crt",
-  "ca_file": "/etc/ca/ca.pem"
+  "cert_file": "/etc/consul/consul-server.crt"
 }
