@@ -9,6 +9,6 @@
     "http": -1,
     "https": 8500
   },
-  "key_file": "/etc/consul/consul-server.key",
-  "cert_file": "/etc/consul/consul-server.crt"
+  "key_file": "/etc/consul/private/consul.key",
+  "cert_file": "/etc/consul/certs/consul.crt"
 }

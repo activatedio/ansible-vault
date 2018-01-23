@@ -3,19 +3,21 @@ storage "{{ vault_storage }}" {
 {% if vault_storage == 'consul' %}
   address = "localhost:8500"
   path = "{{ vault_consul_path }}"
-{% if vault_consul_tls_cert_file is defined %}
+{% if vault_consul_client_generate_key %}
   scheme = "https"
-  tls_cert_file = "{{ vault_consul_tls_cert_file }}"
-  tls_key_file = "{{ vault_consul_tls_key_file }}"
+  tls_cert_file = "/etc/vault/certs/vault-consul-client.crt"
+  tls_key_file = "/etc/vault/private/vault-consul-client.key"
 {% endif %}
 {% endif %}
 }
 
 listener "tcp" {
   address = "{{ vault_tcp_listener_address }}"
-  tls_disable = {{ vault_tls_disable }}
-{% if vault_tls_disable == 0 %}
-  tls_cert_file = "{{ vault_tls_cert_file }}"
-  tls_key_file = "{{ vault_tls_key_file }}"
+{% if vault_generate_key %}
+  tls_disable = 0
+  tls_cert_file = "/etc/vault/certs/vault-composite.crt"
+  tls_key_file = "/etc/vault/private/vault.key"
+{% else %}
+  tls_disable = 1
 {% endif %}
 }

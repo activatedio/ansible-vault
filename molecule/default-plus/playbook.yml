@@ -26,44 +26,23 @@
       ignore_errors: yes
       changed_when: false
       register: consul_running
-    - name: Create ca bundle directory
-      file:
-        path: /usr/local/share/ca-certificates
-        state: directory
-        owner: root
-        group: root
-        mode: 0755
-    - name: Copy SSL CA
-      copy:
-        src: ./certs/ca.crt
-        dest: /usr/local/share/ca-certificates/localhost.crt
-      notify: Update certificate index
     - name: Create consul config directory
       file:
         path: /etc/consul
         state: directory
-    - name: Copy consul keys
-      copy:
-        src: "./certs/{{ item }}"
-        dest: /etc/consul
-      with_items:
-        - consul-server.crt
-        - consul-server.key
-    - name: Create vault keys directory
-      file:
-        path: /etc/vault-keys
-        state: directory
-        owner: "{{ vault_user }}"
-        group: "{{ vault_user }}"
-    - name: Copy vault keys
-      copy:
-        src: "./certs/{{ item }}"
-        dest: /etc/vault-keys
-      with_items:
-        - vault-consul-client.crt
-        - vault-consul-client.key
-        - vault-server.crt
-        - vault-server.key
+    - name: Create consul ssl keys
+      include_role:
+        name: activated-openssl
+      vars:
+        cert_ca_cert_src: ./certs/ca.crt
+        cert_ca_key_src: ./certs/ca.key
+        cert_ca_conf_src: ./certs/cert.conf
+        cert_ca_cert_name: localhost
+        cert_extension_name: cert_ext
+        cert_dest_directory: /etc/consul
+        cert_name: consul
+        cert_owner: root
+        cert_group: root
     - name: Copy consul config
       copy:
         src: ./consul/config.json
@@ -73,17 +52,21 @@
       when: consul_running.rc != 0
       tags:
         - skip_ansible_lint
-  handlers:
-    - name: Update certificate index
-      shell: /usr/sbin/update-ca-certificates
-      tags:
-        - skip_ansible_lint
   roles:
     - role: ansible-activated-vault
   vars:
     vault_storage: consul
     vault_tcp_listener_address: 0.0.0.0:8200
-    vault_tls_cert_file: /etc/vault-keys/vault-server.crt
-    vault_tls_key_file: /etc/vault-keys/vault-server.key
-    vault_consul_tls_cert_file: /etc/vault-keys/vault-consul-client.crt
-    vault_consul_tls_key_file: /etc/vault-keys/vault-consul-client.key
+    vault_generate_key: True
+    vault_ca_cert_src: ./certs/ca.crt
+    vault_ca_key_src: ./certs/ca.key
+    vault_ca_cert_name: localhost
+    vault_ca_conf_src: ./certs/cert.conf
+    vault_cert_extension_name: cert_ext
+    vault_consul_client_generate_key: True
+    vault_consul_client_ca_cert_src: ./certs/ca.crt
+    vault_consul_client_ca_key_src: ./certs/ca.key
+    vault_consul_client_ca_cert_name: localhost
+    vault_consul_client_ca_conf_src: ./certs/cert.conf
+    vault_consul_client_cert_extension_name: cert_ext
+

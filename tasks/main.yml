@@ -43,6 +43,41 @@
     owner: "{{ vault_user }}"
     group: "{{ vault_user }}"
     mode: 0700
+- name: Create vault ssl keys
+  include_role:
+    name: activated-openssl
+  vars:
+    cert_ca_cert_src: "{{ vault_ca_cert_src }}"
+    cert_ca_key_src: "{{ vault_ca_key_src }}"
+    cert_ca_conf_src: "{{ vault_ca_conf_src }}"
+    cert_ca_cert_name: "{{ vault_ca_cert_name }}"
+    cert_extension_name: "{{ vault_cert_extension_name }}"
+    cert_dest_directory: /etc/vault
+    cert_name: vault
+    cert_owner: "{{ vault_user }}"
+    cert_group: "{{ vault_user }}"
+  when: vault_generate_key
+  notify: Restart vault
+- name: Create composite key file
+  shell: "cat /etc/vault/certs/vault.crt /usr/local/share/ca-certificates/{{ vault_ca_cert_name }}.crt > /etc/vault/certs/vault-composite.crt"
+  when: vault_generate_key
+  tags:
+    - skip_ansible_lint
+- name: Create vault consul client ssl keys
+  include_role:
+    name: activated-openssl
+  vars:
+    cert_ca_cert_src: "{{ vault_consul_client_ca_cert_src }}"
+    cert_ca_key_src: "{{ vault_consul_client_ca_key_src }}"
+    cert_ca_conf_src: "{{ vault_consul_client_ca_conf_src }}"
+    cert_ca_cert_name: "{{ vault_consul_client_ca_cert_name }}"
+    cert_extension_name: "{{ vault_consul_client_cert_extension_name }}"
+    cert_dest_directory: /etc/vault
+    cert_name: vault-consul-client
+    cert_owner: "{{ vault_user }}"
+    cert_group: "{{ vault_user }}"
+  when: vault_consul_client_generate_key
+  notify: Restart vault
 - name: Create vault configuration
   template:
     src: config.hcl.j2
