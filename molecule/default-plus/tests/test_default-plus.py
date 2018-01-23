@@ -18,8 +18,10 @@ def test_vault_config(host):
     assert f.contains('storage "consul" {')
     assert f.contains('address = "localhost:8500"')
     assert f.contains('scheme = "https"')
-    assert f.contains('tls_cert_file = "/etc/vault/certs/vault-consul-client.crt"')
-    assert f.contains('tls_key_file = "/etc/vault/private/vault-consul-client.key"')
+    assert f.contains('tls_cert_file = '
+                      + '"/etc/vault/certs/vault-consul-client.crt"')
+    assert f.contains('tls_key_file = '
+                      + '"/etc/vault/private/vault-consul-client.key"')
     assert not f.contains('tls_ca_file')
     assert f.contains('listener "tcp" {')
     assert f.contains('tls_disable = 0')

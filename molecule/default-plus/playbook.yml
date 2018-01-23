@@ -69,4 +69,3 @@
     vault_consul_client_ca_cert_name: localhost
     vault_consul_client_ca_conf_src: ./certs/cert.conf
     vault_consul_client_cert_extension_name: cert_ext
-

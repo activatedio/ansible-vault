@@ -6,5 +6,5 @@ vault_version: 0.9.1
 vault_storage: inmem
 vault_consul_path: vault
 vault_tcp_listener_address: 127.0.0.1:8200
-vault_generate_key: True
-vault_consul_client_generate_key: True
+vault_generate_key: False
+vault_consul_client_generate_key: False
