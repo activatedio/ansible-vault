@@ -4,7 +4,11 @@ After=network.target
 
 [Service]
 User={{ vault_user }}
+{% if vault_dev_mode|bool == true %}
+ExecStart=/usr/local/sbin/vault server -dev
+{% else %}
 ExecStart=/usr/local/sbin/vault server -config /etc/vault/config.hcl
+{% endif %}
 PIDFile=/var/run/vault.pid
 
 [Install]

@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  become: yes
+  vars:
+    vault_dev_mode: true
+  roles:
+    - role: ansible-role-vault

@@ -1,6 +1,4 @@
 ---
-# tasks file for ansible-activated-vault
-
 - name: Create vault user
   user:
     name: "{{ vault_user }}"
@@ -36,6 +34,8 @@
     executable: /bin/bash
   tags:
     -skip_ansible_lint
+- debug:
+    msg: "Raw variable {{ vault_dev_mode }}. Expression {{ vault_dev_mode|bool }}"
 - name: Create vault configuration directory
   file:
     path: /etc/vault
@@ -43,6 +43,7 @@
     owner: "{{ vault_user }}"
     group: "{{ vault_user }}"
     mode: 0700
+  when: vault_dev_mode|bool == false
 - name: Create vault ssl keys
   include_role:
     name: activated-openssl
@@ -85,6 +86,7 @@
     owner: "{{ vault_user }}"
     group: "{{ vault_user }}"
     mode: 0600
+  when: vault_dev_mode|bool == false
   notify: Restart vault
 - name: Create systemd service file
   template:

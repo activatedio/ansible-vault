@@ -1,4 +1,2 @@
 ---
-- src: git@github.com:activatedio/ansible-activated-openssl.git
-  name: activated-openssl
-  scm: git
+- src: activatedinc.sslcert
